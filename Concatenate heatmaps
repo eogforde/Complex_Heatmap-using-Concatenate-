@@ -1,3 +1,6 @@
+# Simple code to creating a concatenated pheatmap/complexheatmap made up of two heatmaps.
+# If you have not already you can install the following packages to to produce these plots. 
+
 install.packages("pheatmap")
 install.packages("RColorBrewer")
 install.packages("circlize")
@@ -11,27 +14,30 @@ library(ComplexHeatmap)
 library("RColorBrewer")
 library(circlize)
 
-#Reading in data csv files 
+# Reading in data csv files (genomics example) 
+# Datafile layout: Column names = Sample name and Row names = genes
+# Code below will work in RStudio with WD set to file location
+
+
 data<-read.csv("Book1.csv",sep=",", row.names=1)
 #datarows<-read.csv("CD206rows.csv",sep=",")
 
 data2<-read.csv("Book2.csv",sep=",", row.names=1)
 
-#Convert dataframe to matrix
+# Convert dataframe to matrix
 Mat1 = data.matrix(data)
-
 Mat2 = data.matrix(data2)
 
-#Adding label annotations to the Sample type
-my_sample_col <- data.frame(sample = rep(c("CML CD34 + BMSC","CML CD34 +"), c(3,3)))
+# Adding label annotations to the Sample type
+my_sample_col <- data.frame(sample = rep(c("LABEL1","LABEL2"), c(3,3)))
 row.names(my_sample_col) <- colnames(data)
 row.names(my_sample_col) <- colnames(data2)
 
 
-# setting annotation label colours
-col = list(sample = c("CML CD34 + BMSC" = "#339933", "CML CD34 +" = "#5977FF"))
+# Setting annotation label colours
+col = list(sample = c("LABEL1" = "#339933", "LABEL2" = "#5977FF"))
 
-#italics for gene names
+# Optional -- Italics for gene names
 newnames <- lapply(
   rownames(data),
   function(x) bquote(italic(.(x))))
@@ -40,7 +46,7 @@ newnames1 <- lapply(
   rownames(data2),
   function(x) bquote(italic(.(x))))
 
-#plotting pheatmap
+# Plotting pheatmap and aesthetics
 p1 = pheatmap(Mat1, cluster_rows = T,  cluster_cols = T, clustering_distance_rows = "pearson", clustering_method = "average",
          scale = "row", show_colnames = F , annotation_col = my_sample_col, annotation_colors = col, cellwidth = 30, 
          cellheight = 8.5, border_color = "grey80", fontsize_row = 8,legend = F, col = colorRampPalette(c("navy", "white", "firebrick3"))(50), labels_row = as.expression(newnames))
@@ -48,4 +54,5 @@ p1 = pheatmap(Mat1, cluster_rows = T,  cluster_cols = T, clustering_distance_row
 p2 = pheatmap(Mat2, cluster_rows = T,  cluster_cols = T, clustering_distance_rows = "pearson", clustering_method = "average",
                 scale = "row", show_colnames = F , annotation_col = my_sample_col, annotation_colors = col, cellwidth = 30, 
                 cellheight = 8.5, border_color = "grey80", fontsize_row = 8,legend = F, col = colorRampPalette(c("navy", "white", "firebrick3"))(50), labels_row = as.expression(newnames1))
+
 p1 = p2
